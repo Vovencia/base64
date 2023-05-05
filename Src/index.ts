@@ -1,67 +1,90 @@
-import {ReadFilesFromInput} from "./Utils/ReadFilesFromInput";
+import {ReadFile, ReadFilesFromInput} from "./Utils/ReadFilesFromInput";
 import {CopyTextToClipboard} from "./Utils/CopyTextToClipboard";
 import {OptimizeImage} from "./Utils/OptimizeImage";
 
 const $inputFile = document.querySelector('#input-file') as HTMLInputElement;
 const $output = document.querySelector('#output') as HTMLDivElement;
 
+async function setImageFile(file: File) {
+	if (!file) {
+		return alert('Файл не выбран');
+	}
+	switch (file.type) {
+		case 'image/png':
+		case 'image/jpg':
+		case 'image/jpeg':
+			break;
+		default:
+			return alert(`Неподдерживаемый формат: ${ file.type }`)
+	}
+	const { base64 } = await ReadFile(file);
+	$output.innerHTML = '';
+
+	const origBase64 = base64;
+	const { jpg, png } = await OptimizeImage(base64);
+
+	const origStat = {
+		base64: origBase64,
+		isSmaller: true,
+		name: 'Оригинальная',
+	};
+	const jpgStat = {
+		base64: jpg,
+		isSmaller: false,
+		name: 'JPG',
+	};
+	const pngStat = {
+		base64: png,
+		isSmaller: false,
+		name: 'PNG',
+	};
+	let currentSmaller = origStat;
+	const list = [origStat, jpgStat, pngStat];
+
+	for (const item of list) {
+		if (item.base64.length < currentSmaller.base64.length) {
+			currentSmaller.isSmaller = false;
+			item.isSmaller = true;
+			currentSmaller = item;
+		}
+	}
+
+
+	const $original = createOutput(
+		`${ renderIsSmaller(origStat) }Original image:`,
+		origBase64,
+	);
+	const $jpg = createOutput(
+		`${ renderIsSmaller(jpgStat) }JPG image:`,
+		jpg,
+	);
+	const $png = createOutput(
+		`${ renderIsSmaller(pngStat) }PNG image:`,
+		png,
+	);
+
+	const $best = createOutput(
+		`Оптимальный [${ currentSmaller.name }]:`,
+		currentSmaller.base64,
+	);
+
+	$output.appendChild($best);
+	$output.appendChild($original);
+	$output.appendChild($jpg);
+	$output.appendChild($png);
+}
+
+window.addEventListener('paste', async event => {
+	const files = (event.clipboardData?.files || []);
+	if (!files.length) {
+		return alert('Отсутствуют файлы в буфере обмена')
+	}
+	await setImageFile(files[0]);
+});
+
 $inputFile.addEventListener('change', async () => {
 	const files = await ReadFilesFromInput($inputFile);
-	$output.innerHTML = '';
-	for (const file of files) {
-		const origBase64 = file.base64;
-		const { jpg, png } = await OptimizeImage(file.base64);
-
-		const origStat = {
-			base64: origBase64,
-			isSmaller: true,
-			name: 'Оригинальная',
-		};
-		const jpgStat = {
-			base64: jpg,
-			isSmaller: false,
-			name: 'JPG',
-		};
-		const pngStat = {
-			base64: png,
-			isSmaller: false,
-			name: 'PNG',
-		};
-		let currentSmaller = origStat;
-		const list = [origStat, jpgStat, pngStat];
-
-		for (const item of list) {
-			if (item.base64.length < currentSmaller.base64.length) {
-				currentSmaller.isSmaller = false;
-				item.isSmaller = true;
-				currentSmaller = item;
-			}
-		}
-
-
-		const $original = createOutput(
-			`${ renderIsSmaller(origStat) }Original image:`,
-			origBase64,
-		);
-		const $jpg = createOutput(
-			`${ renderIsSmaller(jpgStat) }JPG image:`,
-			jpg,
-		);
-		const $png = createOutput(
-			`${ renderIsSmaller(pngStat) }PNG image:`,
-			png,
-		);
-
-		const $best = createOutput(
-			`Оптимальный [${ currentSmaller.name }]:`,
-			currentSmaller.base64,
-		);
-
-		$output.appendChild($best);
-		$output.appendChild($original);
-		$output.appendChild($jpg);
-		$output.appendChild($png);
-	}
+	await setImageFile(files[0])
 });
 
 function renderIsSmaller(item: { isSmaller: boolean }) {
