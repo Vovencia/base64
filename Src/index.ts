@@ -21,7 +21,10 @@ async function setImageFile(file: File) {
 	$output.innerHTML = '';
 
 	const origBase64 = base64;
-	const { jpg, png } = await OptimizeImage(base64);
+	const { jpg, png } = await OptimizeImage(base64, {
+		MaxSize: 500,
+		Quality: 40,
+	});
 
 	const origStat = {
 		base64: origBase64,
