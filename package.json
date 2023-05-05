@@ -1,0 +1,44 @@
+{
+  "name": "base64",
+  "version": "1.0.0",
+  "description": "Конвертация изображений в base64 с использованием оптимизаций",
+  "main": "index.js",
+  "browser": "./Src/index.html",
+  "scripts": {
+    "start": "parcel serve --target app",
+    "build": "parcel build --target app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vovencia/base64.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vovencia/base64/issues"
+  },
+  "homepage": "https://github.com/Vovencia/base64#readme",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.8.3",
+    "assert": "^2.0.0",
+    "browserify-zlib": "^0.2.0",
+    "events": "^3.3.0",
+    "jimp": "^0.22.7",
+    "parcel": "^2.8.3",
+    "path-browserify": "^1.0.1",
+    "prettier": "^2.8.8",
+    "stream-browserify": "^3.0.0",
+    "typescript": "^5.0.4",
+    "util": "^0.12.5"
+  },
+  "targets": {
+    "app": {
+      "source": "Src/index.html",
+      "distDir": "pages",
+      "context": "browser",
+      "outputFormat": "commonjs",
+      "isLibrary": false
+    }
+  }
+}
