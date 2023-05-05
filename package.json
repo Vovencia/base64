@@ -38,7 +38,8 @@
       "distDir": "docs",
       "context": "browser",
       "outputFormat": "commonjs",
-      "isLibrary": false
+      "isLibrary": false,
+      "publicUrl": "./"
     }
   }
 }
