@@ -35,7 +35,7 @@
   "targets": {
     "app": {
       "source": "Src/index.html",
-      "distDir": "pages",
+      "distDir": "docs",
       "context": "browser",
       "outputFormat": "commonjs",
       "isLibrary": false
